@@ -17,6 +17,19 @@ const state = {
   profile: ""
 }
 
-const Model = { httpTask, log, url, state }
+const onError = (mdl) => (errors) => (mdl.errors = errors)
+const onSuccess = (mdl) => (data) => (mdl.data = data)
+
+const Model = {
+  httpTask,
+  log,
+  url,
+  state,
+  symbol: "MSFT",
+  errors: undefined,
+  data: undefined,
+  onError,
+  onSuccess
+}
 
 export default Model

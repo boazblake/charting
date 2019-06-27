@@ -1969,7 +1969,6 @@ var _secrets = require("../.secrets.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// let apikey = "demo"
 var log = function log(m) {
   return function (v) {
     console.log(m, v);
@@ -1996,11 +1995,29 @@ var httpTask = function httpTask(url) {
 var state = {
   profile: ""
 };
+
+var onError = function onError(mdl) {
+  return function (errors) {
+    return mdl.errors = errors;
+  };
+};
+
+var onSuccess = function onSuccess(mdl) {
+  return function (data) {
+    return mdl.data = data;
+  };
+};
+
 var Model = {
   httpTask: httpTask,
   log: log,
   url: url,
-  state: state
+  state: state,
+  symbol: "MSFT",
+  errors: undefined,
+  data: undefined,
+  onError: onError,
+  onSuccess: onSuccess
 };
 var _default = Model;
 exports.default = _default;
@@ -20049,9 +20066,7 @@ var eitherToTask = function eitherToTask(x) {
 };
 
 var getStocks = function getStocks(mdl) {
-  return function (state) {
-    return mdl.httpTask(mdl.url(state.company)).map(parse).chain(eitherToTask).map(toViewModel(catagories));
-  };
+  return mdl.httpTask(mdl.url(mdl.symbol)).map(parse).chain(eitherToTask).map(toViewModel(catagories));
 };
 
 exports.getStocks = getStocks;
@@ -20061,7 +20076,7 @@ exports.getStocks = getStocks;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.routes = void 0;
 
 var _mithril = _interopRequireDefault(require("mithril"));
 
@@ -20069,37 +20084,36 @@ var _helpers = require("./helpers.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Input = function Input(_ref) {
-  var state = _ref.attrs.state;
-  var company = state.company;
+var Input = function Input() {
+  var symbol = mdl.symbol;
   return {
-    view: function view(_ref2) {
-      var update = _ref2.attrs.update;
-      return (0, _mithril.default)("", [(0, _mithril.default)("input[type=text]", {
-        value: company,
+    view: function view(_ref) {
+      var mdl = _ref.attrs.mdl;
+      return [(0, _mithril.default)("input[type=text]", {
+        value: mdl.symbol,
         oninput: function oninput(e) {
-          return company = e.target.value;
+          return symbol = e.target.value;
         }
       }), (0, _mithril.default)("button", {
         onclick: function onclick() {
-          return update(company);
+          console.log(symbol);
+
+          _mithril.default.route("/".concat(symbol));
         }
-      }, "Get Stocks")]);
+      }, "Get Stocks")];
     },
     onremove: function onremove() {
-      return company = null;
+      return symbol = null;
     }
   };
 };
 
 var Chart = {
-  onupdate: function onupdate(_ref3) {
-    var dom = _ref3.dom,
-        _ref3$attrs = _ref3.attrs,
-        mdl = _ref3$attrs.mdl,
-        state = _ref3$attrs.state;
-    Plotly.newPlot(dom, state.data, {
-      title: state.company
+  onupdate: function onupdate(_ref2) {
+    var dom = _ref2.dom,
+        mdl = _ref2.attrs.mdl;
+    Plotly.newPlot(dom, mdl.data, {
+      title: mdl.symbol
     });
   },
   view: function view() {
@@ -20109,44 +20123,16 @@ var Chart = {
   }
 };
 
-var App = function App(_ref4) {
-  var mdl = _ref4.attrs.mdl;
-  var state = {
-    company: "MSFT",
-    data: [],
-    errors: []
-  };
-
-  var onError = function onError(state) {
-    return function (errors) {
-      return state.errors = errors;
-    };
-  };
-
-  var onSuccess = function onSuccess(state) {
-    return function (data) {
-      return state.data = data;
-    };
-  };
-
-  (0, _helpers.getStocks)(mdl)(state).fork(onError(state), onSuccess(state));
-
-  var updateCompany = function updateCompany(s) {
-    return function (company) {
-      s.company = company;
-      (0, _helpers.getStocks)(mdl)(s).fork(onError(s), onSuccess(s));
-    };
-  };
-
+var App = function App(_ref3) {
+  var mdl = _ref3.attrs.mdl;
+  console.log(mdl);
+  (0, _helpers.getStocks)(mdl).fork(mdl.onError(mdl), mdl.onSuccess(mdl));
   return {
     view: function view() {
       return (0, _mithril.default)(".app", [(0, _mithril.default)(Input, {
-        mdl: mdl,
-        state: state,
-        update: updateCompany(state)
+        mdl: mdl
       }), (0, _mithril.default)(Chart, {
-        mdl: mdl,
-        state: state
+        mdl: mdl
       })]);
     },
     onremove: function onremove() {
@@ -20155,8 +20141,23 @@ var App = function App(_ref4) {
   };
 };
 
-var _default = App;
-exports.default = _default;
+var routes = function routes(mdl) {
+  return {
+    "/:symbol": {
+      onmatch: function onmatch(_ref4) {
+        var symbol = _ref4.symbol;
+        mdl.symbol = symbol;
+      },
+      render: function render() {
+        return (0, _mithril.default)(App, {
+          mdl: mdl
+        });
+      }
+    }
+  };
+};
+
+exports.routes = routes;
 },{"mithril":"../../../../node_modules/mithril/mithril.js","./helpers.js":"src/helpers.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
@@ -20164,10 +20165,11 @@ var _mithril = _interopRequireDefault(require("mithril"));
 
 var _model = _interopRequireDefault(require("./src/model.js"));
 
-var _App = _interopRequireDefault(require("./src/App.js"));
+var _App = require("./src/App.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// import App from "./src/App.js"
 if (module.hot) {
   module.hot.accept();
 }
@@ -20203,15 +20205,9 @@ function checkWidth() {
 }
 
 checkWidth();
-var root = document.body;
+var root = document.body; // m.mount(root, { view: () => m(App, { mdl: Model }) })
 
-_mithril.default.mount(root, {
-  view: function view() {
-    return (0, _mithril.default)(_App.default, {
-      mdl: _model.default
-    });
-  }
-});
+_mithril.default.route(root, "/MSFT", (0, _App.routes)(_model.default));
 },{"mithril":"../../../../node_modules/mithril/mithril.js","./src/model.js":"src/model.js","./src/App.js":"src/App.js"}],"../../../../.config/yarn/global/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -20240,7 +20236,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58537" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54826" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

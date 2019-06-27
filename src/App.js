@@ -1,62 +1,55 @@
 import m from "mithril"
 import { getStocks } from "./helpers.js"
 
-const Input = ({ attrs: { state } }) => {
-  let company = state.company
-
+const Input = () => {
+  let symbol = mdl.symbol
   return {
-    view: ({ attrs: { update } }) =>
-      m("", [
-        m("input[type=text]", {
-          value: company,
-          oninput: (e) => (company = e.target.value)
-        }),
-        m(
-          "button",
-          {
-            onclick: () => update(company)
-          },
-          "Get Stocks"
-        )
-      ]),
-    onremove: () => (company = null)
+    view: ({ attrs: { mdl } }) => [
+      m("input[type=text]", {
+        value: mdl.symbol,
+        oninput: (e) => (symbol = e.target.value)
+      }),
+      m(
+        "button",
+        {
+          onclick: () => {
+            console.log(symbol)
+            m.route(`/${symbol}`)
+          }
+        },
+        "Get Stocks"
+      )
+    ],
+    onremove: () => (symbol = null)
   }
 }
 
 const Chart = {
-  onupdate: ({ dom, attrs: { mdl, state } }) => {
-    Plotly.newPlot(dom, state.data, {
-      title: state.company
+  onupdate: ({ dom, attrs: { mdl } }) => {
+    Plotly.newPlot(dom, mdl.data, {
+      title: mdl.symbol
     })
   },
   view: () => m(".chart", { id: "chart" })
 }
 
 const App = ({ attrs: { mdl } }) => {
-  let state = {
-    company: "MSFT",
-    data: [],
-    errors: []
-  }
-
-  const onError = (state) => (errors) => (state.errors = errors)
-  const onSuccess = (state) => (data) => (state.data = data)
-
-  getStocks(mdl)(state).fork(onError(state), onSuccess(state))
-
-  const updateCompany = (s) => (company) => {
-    s.company = company
-    getStocks(mdl)(s).fork(onError(s), onSuccess(s))
-  }
+  console.log(mdl)
+  getStocks(mdl).fork(mdl.onError(mdl), mdl.onSuccess(mdl))
 
   return {
-    view: () =>
-      m(".app", [
-        m(Input, { mdl, state, update: updateCompany(state) }),
-        m(Chart, { mdl, state })
-      ]),
+    view: () => m(".app", [m(Input, { mdl }), m(Chart, { mdl })]),
     onremove: () => (state = null)
   }
 }
 
-export default App
+const routes = (mdl) => ({
+  "/:symbol": {
+    onmatch: ({ symbol }) => {
+      mdl.symbol = symbol
+    },
+    render: () => m(App, { mdl })
+  }
+})
+
+export { routes }
