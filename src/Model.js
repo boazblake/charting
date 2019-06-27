@@ -2,8 +2,6 @@ import m from "mithril"
 import Task from "data.task"
 import { apikey } from "../.secrets.js"
 
-// let apikey = "demo"
-
 const log = (m) => (v) => {
   console.log(m, v)
   return v
