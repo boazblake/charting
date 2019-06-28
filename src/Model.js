@@ -2,6 +2,8 @@ import m from "mithril"
 import Task from "data.task"
 import { apikey } from "../.secrets.js"
 
+// let apikey = "demo"
+
 const log = (m) => (v) => {
   console.log(m, v)
   return v
@@ -14,22 +16,12 @@ const http = (url) => m.request({ url })
 const httpTask = (url) => new Task((rej, res) => http(url).then(res, rej))
 
 const state = {
-  profile: ""
-}
-
-const onError = (mdl) => (errors) => (mdl.errors = errors)
-const onSuccess = (mdl) => (data) => (mdl.data = data)
-
-const Model = {
-  httpTask,
-  log,
-  url,
-  state,
+  profile: "",
   symbol: "MSFT",
-  errors: undefined,
-  data: undefined,
-  onError,
-  onSuccess
+  data: [],
+  errors: []
 }
+
+const Model = { httpTask, log, url, state }
 
 export default Model

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel ./index.html --out-dir ./docs",
+    "dev": "parcel serve ./index.html --out-dir ./docs",
     "build": "parcel build ./index.html --public-url ./ --out-dir ./docs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,7 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "daggy": "^1.4.0",
-    "data.either": "^1.5.2",
     "data.task": "^3.1.2",
     "mithril": "^1.1.6",
     "mithril-stream": "^2.0.0",

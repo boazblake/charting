@@ -1,7 +1,6 @@
 import m from "mithril"
 
 import Model from "./src/model.js"
-// import App from "./src/App.js"
 import { routes } from "./src/App.js"
 
 if (module.hot) {
@@ -41,6 +40,4 @@ checkWidth()
 
 const root = document.body
 
-// m.mount(root, { view: () => m(App, { mdl: Model }) })
-
-m.route(root, "/MSFT", routes(Model))
+m.route(root, "/:key", routes(Model))

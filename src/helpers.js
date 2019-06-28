@@ -76,7 +76,7 @@ const eitherToTask = (x) =>
 
 const getStocks = (mdl) =>
   mdl
-    .httpTask(mdl.url(mdl.symbol))
+    .httpTask(mdl.url(mdl.state.symbol))
     .map(parse)
     .chain(eitherToTask)
     .map(toViewModel(catagories))

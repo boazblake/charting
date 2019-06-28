@@ -1,55 +1,67 @@
 import m from "mithril"
 import { getStocks } from "./helpers.js"
 
-const Input = () => {
-  let symbol = mdl.symbol
+const Input = ({ attrs: { mdl } }) => {
+  let symbol = mdl.state.symbol
+
   return {
-    view: ({ attrs: { mdl } }) => [
-      m("input[type=text]", {
-        value: mdl.symbol,
-        oninput: (e) => (symbol = e.target.value)
-      }),
-      m(
-        "button",
-        {
-          onclick: () => {
-            console.log(symbol)
-            m.route(`/${symbol}`)
+    view: ({ attrs: { update } }) =>
+      m("", [
+        m("input[type=text]", {
+          value: symbol,
+          oninput: (e) => {
+            symbol = e.target.value
           }
-        },
-        "Get Stocks"
-      )
-    ],
-    onremove: () => (symbol = null)
+        }),
+        m(
+          "button",
+          {
+            onclick: () => {
+              mdl.state.symbol = symbol
+              m.route.set(`/${mdl.state.symbol}`)
+            }
+          },
+          "Get Stocks"
+        )
+      ])
   }
 }
 
-const Chart = {
-  onupdate: ({ dom, attrs: { mdl } }) => {
-    Plotly.newPlot(dom, mdl.data, {
-      title: mdl.symbol
+const Chart = ({ attrs: { mdl } }) => {
+  const toPlot = (dom, mdl) =>
+    Plotly.newPlot(dom, mdl.state.data, {
+      title: mdl.state.symbol
     })
-  },
-  view: () => m(".chart", { id: "chart" })
-}
-
-const App = ({ attrs: { mdl } }) => {
-  console.log(mdl)
-  getStocks(mdl).fork(mdl.onError(mdl), mdl.onSuccess(mdl))
 
   return {
-    view: () => m(".app", [m(Input, { mdl }), m(Chart, { mdl })]),
-    onremove: () => (state = null)
+    oncreate: ({ dom, attrs: { mdl } }) => toPlot(dom, mdl),
+    view: () => m(".chart", { id: "chart" })
   }
 }
 
-const routes = (mdl) => ({
-  "/:symbol": {
-    onmatch: ({ symbol }) => {
-      mdl.symbol = symbol
-    },
-    render: () => m(App, { mdl })
+const App = (mdl) => {
+  console.log(mdl)
+  const onError = (errors) => {
+    console.log(errors)
+    mdl.state.errors = errors
   }
-})
+  const onSuccess = (data) => {
+    console.log(mdl.state)
+    mdl.state.data = data
+  }
 
-export { routes }
+  console.log("app again")
+  return {
+    oninit: ({ attrs: { key } }) => {
+      mdl.state.symbol = key
+      getStocks(mdl).fork(onError, onSuccess)
+    },
+    view: () => m(".app", m(Input, { mdl }), m(Chart, { mdl }))
+  }
+}
+
+export const routes = (mdl) => {
+  return {
+    "/:key": App(mdl)
+  }
+}

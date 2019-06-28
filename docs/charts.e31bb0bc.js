@@ -1969,6 +1969,7 @@ var _secrets = require("../.secrets.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// let apikey = "demo"
 var log = function log(m) {
   return function (v) {
     console.log(m, v);
@@ -1993,31 +1994,16 @@ var httpTask = function httpTask(url) {
 };
 
 var state = {
-  profile: ""
+  profile: "",
+  symbol: "MSFT",
+  data: [],
+  errors: []
 };
-
-var onError = function onError(mdl) {
-  return function (errors) {
-    return mdl.errors = errors;
-  };
-};
-
-var onSuccess = function onSuccess(mdl) {
-  return function (data) {
-    return mdl.data = data;
-  };
-};
-
 var Model = {
   httpTask: httpTask,
   log: log,
   url: url,
-  state: state,
-  symbol: "MSFT",
-  errors: undefined,
-  data: undefined,
-  onError: onError,
-  onSuccess: onSuccess
+  state: state
 };
 var _default = Model;
 exports.default = _default;
@@ -20066,7 +20052,7 @@ var eitherToTask = function eitherToTask(x) {
 };
 
 var getStocks = function getStocks(mdl) {
-  return mdl.httpTask(mdl.url(mdl.symbol)).map(parse).chain(eitherToTask).map(toViewModel(catagories));
+  return mdl.httpTask(mdl.url(mdl.state.symbol)).map(parse).chain(eitherToTask).map(toViewModel(catagories));
 };
 
 exports.getStocks = getStocks;
@@ -20084,76 +20070,84 @@ var _helpers = require("./helpers.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Input = function Input() {
-  var symbol = mdl.symbol;
+var Input = function Input(_ref) {
+  var mdl = _ref.attrs.mdl;
+  var symbol = mdl.state.symbol;
   return {
-    view: function view(_ref) {
-      var mdl = _ref.attrs.mdl;
-      return [(0, _mithril.default)("input[type=text]", {
-        value: mdl.symbol,
+    view: function view(_ref2) {
+      var update = _ref2.attrs.update;
+      return (0, _mithril.default)("", [(0, _mithril.default)("input[type=text]", {
+        value: symbol,
         oninput: function oninput(e) {
-          return symbol = e.target.value;
+          symbol = e.target.value;
         }
       }), (0, _mithril.default)("button", {
         onclick: function onclick() {
-          console.log(symbol);
+          mdl.state.symbol = symbol;
 
-          _mithril.default.route("/".concat(symbol));
+          _mithril.default.route.set("/".concat(mdl.state.symbol));
         }
-      }, "Get Stocks")];
-    },
-    onremove: function onremove() {
-      return symbol = null;
+      }, "Get Stocks")]);
     }
   };
 };
 
-var Chart = {
-  onupdate: function onupdate(_ref2) {
-    var dom = _ref2.dom,
-        mdl = _ref2.attrs.mdl;
-    Plotly.newPlot(dom, mdl.data, {
-      title: mdl.symbol
+var Chart = function Chart(_ref3) {
+  var mdl = _ref3.attrs.mdl;
+
+  var toPlot = function toPlot(dom, mdl) {
+    return Plotly.newPlot(dom, mdl.state.data, {
+      title: mdl.state.symbol
     });
-  },
-  view: function view() {
-    return (0, _mithril.default)(".chart", {
-      id: "chart"
-    });
-  }
+  };
+
+  return {
+    oncreate: function oncreate(_ref4) {
+      var dom = _ref4.dom,
+          mdl = _ref4.attrs.mdl;
+      return toPlot(dom, mdl);
+    },
+    view: function view() {
+      return (0, _mithril.default)(".chart", {
+        id: "chart"
+      });
+    }
+  };
 };
 
-var App = function App(_ref3) {
-  var mdl = _ref3.attrs.mdl;
+var App = function App(mdl) {
   console.log(mdl);
-  (0, _helpers.getStocks)(mdl).fork(mdl.onError(mdl), mdl.onSuccess(mdl));
+
+  var onError = function onError(errors) {
+    console.log(errors);
+    mdl.state.errors = errors;
+  };
+
+  var onSuccess = function onSuccess(data) {
+    console.log(mdl.state);
+    mdl.state.data = data;
+  };
+
+  console.log("app again");
   return {
+    oninit: function oninit(_ref5) {
+      var key = _ref5.attrs.key;
+      mdl.state.symbol = key;
+      (0, _helpers.getStocks)(mdl).fork(onError, onSuccess);
+    },
     view: function view() {
-      return (0, _mithril.default)(".app", [(0, _mithril.default)(Input, {
+      return (0, _mithril.default)(".app", (0, _mithril.default)(Input, {
         mdl: mdl
       }), (0, _mithril.default)(Chart, {
         mdl: mdl
-      })]);
-    },
-    onremove: function onremove() {
-      return state = null;
+      }));
     }
   };
 };
 
 var routes = function routes(mdl) {
   return {
-    "/:symbol": {
-      onmatch: function onmatch(_ref4) {
-        var symbol = _ref4.symbol;
-        mdl.symbol = symbol;
-      },
-      render: function render() {
-        return (0, _mithril.default)(App, {
-          mdl: mdl
-        });
-      }
-    }
+    "/:key": App(mdl)
   };
 };
 
@@ -20169,7 +20163,6 @@ var _App = require("./src/App.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// import App from "./src/App.js"
 if (module.hot) {
   module.hot.accept();
 }
@@ -20205,9 +20198,9 @@ function checkWidth() {
 }
 
 checkWidth();
-var root = document.body; // m.mount(root, { view: () => m(App, { mdl: Model }) })
+var root = document.body;
 
-_mithril.default.route(root, "/MSFT", (0, _App.routes)(_model.default));
+_mithril.default.route(root, "/:key", (0, _App.routes)(_model.default));
 },{"mithril":"../../../../node_modules/mithril/mithril.js","./src/model.js":"src/model.js","./src/App.js":"src/App.js"}],"../../../../.config/yarn/global/node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -20236,7 +20229,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54826" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59503" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
