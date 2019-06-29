@@ -25175,7 +25175,9 @@ var Search = function Search(_ref4) {
     mdl.state.symbol = symbol;
     showList = false;
 
-    _mithril.default.route.set("/".concat(mdl.state.symbol));
+    _mithril.default.route.set("/".concat(mdl.state.symbol), {
+      replace: true
+    });
   };
 
   return {
@@ -25189,12 +25191,17 @@ var Search = function Search(_ref4) {
         value: symbol,
         oninput: function oninput(e) {
           showList = true;
-          mdl.state.data = undefined;
-          mdl.state.errors = undefined;
           symbol = e.target.value.toUpperCase();
           symbols = (0, _helpers.filterBy)(mdl.state.symbols, symbol);
         }
-      })]), showList && (0, _mithril.default)(SymbolList, {
+      }), (0, _mithril.default)("button.btn", {
+        onclick: function onclick() {
+          mdl.state.symbol = symbol;
+          showList = false;
+
+          _mithril.default.route.set("/".concat(mdl.state.symbol));
+        }
+      }, "Get Stocks")]), showList && (0, _mithril.default)(SymbolList, {
         symbols: symbols,
         selectSymbol: selectSymbol
       })]);
@@ -25202,9 +25209,7 @@ var Search = function Search(_ref4) {
   };
 };
 
-var Chart = function Chart(_ref7) {
-  var mdl = _ref7.attrs.mdl;
-
+var Chart = function Chart() {
   var toPlot = function toPlot(dom, mdl) {
     return Plotly.newPlot(dom, mdl.state.data, {
       title: mdl.state.symbol
@@ -25212,9 +25217,9 @@ var Chart = function Chart(_ref7) {
   };
 
   return {
-    oncreate: function oncreate(_ref8) {
-      var dom = _ref8.dom,
-          mdl = _ref8.attrs.mdl;
+    oncreate: function oncreate(_ref7) {
+      var dom = _ref7.dom,
+          mdl = _ref7.attrs.mdl;
       return toPlot(dom, mdl);
     },
     view: function view() {
@@ -25237,8 +25242,8 @@ var App = function App(mdl) {
   };
 
   return {
-    oninit: function oninit(_ref9) {
-      var key = _ref9.attrs.key;
+    oninit: function oninit(_ref8) {
+      var key = _ref8.attrs.key;
       mdl.state.symbol = key;
       (0, _helpers.getStocks)(mdl).then(onSuccess, onError);
     },
@@ -25361,8 +25366,6 @@ function getProfile(w) {
 } // Styles
 
 
-// import './utils/animations.css'
-// import './utils/loader.scss'
 var winW = window.innerWidth;
 _model.default.state.profile = getProfile(winW);
 
@@ -25411,7 +25414,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54510" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59866" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

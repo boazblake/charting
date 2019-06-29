@@ -19,8 +19,6 @@ function getProfile(w) {
 
 // Styles
 import "./index.scss"
-// import './utils/animations.css'
-// import './utils/loader.scss'
 
 let winW = window.innerWidth
 Model.state.profile = getProfile(winW)

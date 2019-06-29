@@ -42,7 +42,7 @@ const Search = ({ attrs: { mdl } }) => {
     symbol = value
     mdl.state.symbol = symbol
     showList = false
-    m.route.set(`/${mdl.state.symbol}`)
+    m.route.set(`/${mdl.state.symbol}`, { replace: true })
   }
 
   return {
@@ -55,19 +55,28 @@ const Search = ({ attrs: { mdl } }) => {
             value: symbol,
             oninput: (e) => {
               showList = true
-              mdl.state.data = undefined
-              mdl.state.errors = undefined
               symbol = e.target.value.toUpperCase()
               symbols = filterBy(mdl.state.symbols, symbol)
             }
-          })
+          }),
+          m(
+            "button.btn",
+            {
+              onclick: () => {
+                mdl.state.symbol = symbol
+                showList = false
+                m.route.set(`/${mdl.state.symbol}`)
+              }
+            },
+            "Get Stocks"
+          )
         ]),
         showList && m(SymbolList, { symbols, selectSymbol })
       ])
   }
 }
 
-const Chart = ({ attrs: { mdl } }) => {
+const Chart = () => {
   const toPlot = (dom, mdl) =>
     Plotly.newPlot(dom, mdl.state.data, {
       title: mdl.state.symbol

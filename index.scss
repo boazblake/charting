@@ -2,12 +2,31 @@
   box-sizing: border-box;
 }
 
-.input {
+.inputContainer {
   width: 100%;
-  line-height: 3em;
-  text-transform: uppercase;
-  flex-basis: 80%;
-  font-size: 18px;
+  display: flex;
+  flex-flow: row;
+
+  .input {
+    line-height: 3em;
+    text-transform: uppercase;
+    flex-basis: 80%;
+    font-size: 18px;
+  }
+
+  .btn {
+    flex-basis: 20%;
+    font-size: 18px;
+    cursor: pointer;
+    color: #f1c40f;
+    background: #34495e;
+
+    &:hover {
+      background: #f1c40f;
+      color: #34495e;
+      transition: all 0.4s;
+    }
+  }
 }
 
 .symbolsList {
