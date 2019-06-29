@@ -40,4 +40,4 @@ checkWidth()
 
 const root = document.body
 
-m.route(root, "/:key", routes(Model))
+m.route(root, `/${Model.state.symbol}`, routes(Model))

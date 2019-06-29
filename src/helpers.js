@@ -1,6 +1,7 @@
 import { prop, pluck, compose } from "ramda"
 import Either from "data.either"
 import Task from "data.task"
+import { ETIME } from "constants"
 
 const catagories = [
   "1. open",
@@ -66,12 +67,20 @@ const toViewModel = (cats) =>
     fromDto
   )
 
-const parse = Either.try(prop("Monthly Adjusted Time Series"))
+const parse = (dto) =>
+  prop("Monthly Adjusted Time Series", dto)
+    ? Either.Right(prop("Monthly Adjusted Time Series", dto))
+    : Either.Left(prop("Error Message", dto))
+    ? Either.Left(prop("Note", dto))
+    : Either.Left(Task.rejected({ "Error Message": "undefined error" }))
 
 const eitherToTask = (x) =>
   x.cata({
     Left: (error) => Task.rejected(error),
-    Right: (data) => Task.of(data)
+    Right: (data) =>
+      data == undefined
+        ? Task.rejected({ "Error Message": "undefined error" })
+        : Task.of(data)
   })
 
 const getStocks = (mdl) =>
@@ -79,6 +88,7 @@ const getStocks = (mdl) =>
     .httpTask(mdl.url(mdl.state.symbol))
     .map(parse)
     .chain(eitherToTask)
+    .map(mdl.log("wft"))
     .map(toViewModel(catagories))
 
 export { getStocks }

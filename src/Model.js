@@ -18,8 +18,8 @@ const httpTask = (url) => new Task((rej, res) => http(url).then(res, rej))
 const state = {
   profile: "",
   symbol: "MSFT",
-  data: [],
-  errors: []
+  data: undefined,
+  errors: undefined
 }
 
 const Model = { httpTask, log, url, state }

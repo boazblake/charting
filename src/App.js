@@ -1,16 +1,23 @@
 import m from "mithril"
 import { getStocks } from "./helpers.js"
 
+const Errors = {
+  view: ({ attrs: { mdl } }) =>
+    m("code", JSON.stringify(mdl.state.errors, null, 2))
+}
+
 const Input = ({ attrs: { mdl } }) => {
   let symbol = mdl.state.symbol
 
   return {
-    view: ({ attrs: { update } }) =>
+    view: ({ attrs: { mdl } }) =>
       m("", [
         m("input[type=text]", {
           value: symbol,
           oninput: (e) => {
-            symbol = e.target.value
+            mdl.state.data = undefined
+            mdl.state.errors = undefined
+            symbol = e.target.value.toUpperCase()
           }
         }),
         m(
@@ -44,9 +51,11 @@ const App = (mdl) => {
   const onError = (errors) => {
     console.log(errors)
     mdl.state.errors = errors
+    mdl.state.data = undefined
   }
   const onSuccess = (data) => {
     console.log(mdl.state)
+    mdl.state.errors = undefined
     mdl.state.data = data
   }
 
@@ -56,7 +65,13 @@ const App = (mdl) => {
       mdl.state.symbol = key
       getStocks(mdl).fork(onError, onSuccess)
     },
-    view: () => m(".app", m(Input, { mdl }), m(Chart, { mdl }))
+    view: () =>
+      m(
+        ".app",
+        m(Input, { mdl }),
+        mdl.state.data && m(Chart, { mdl }),
+        mdl.state.errors && m(Errors, { mdl })
+      )
   }
 }
 
