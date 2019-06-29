@@ -1,12 +1,11 @@
 import m from "mithril"
 import { getStocks, load, filterBy } from "./helpers.js"
 
-const Errors = {
-  view: ({ attrs: { mdl } }) =>
-    m(
-      "code",
-      JSON.stringify(mdl.state.errors || mdl.state.searchError, null, 2)
-    )
+const Errors = ({ attrs: { mdl } }) => {
+  let err = mdl.state.errors.message
+  return {
+    view: () => m("code.error", err)
+  }
 }
 
 const SymbolList = () => {
@@ -27,14 +26,13 @@ const Search = ({ attrs: { mdl } }) => {
   let showList = false
 
   const onError = (mdl) => (error) => {
-    mdl.state.searchError = error
+    mdl.state.errors = error
     mdl.state.symbols = undefined
-    console.log("eer searching", mdl.state)
   }
 
   const onSuccess = (mdl) => (data) => {
     mdl.state.symbols = data
-    mdl.state.searchError = undefined
+    mdl.state.errors = undefined
   }
 
   const selectSymbol = (value) => {

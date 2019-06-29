@@ -25122,11 +25122,14 @@ var _helpers = require("./helpers.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Errors = {
-  view: function view(_ref) {
-    var mdl = _ref.attrs.mdl;
-    return (0, _mithril.default)("code", JSON.stringify(mdl.state.errors || mdl.state.searchError, null, 2));
-  }
+var Errors = function Errors(_ref) {
+  var mdl = _ref.attrs.mdl;
+  var err = mdl.state.errors.message;
+  return {
+    view: function view() {
+      return (0, _mithril.default)("code.error", err);
+    }
+  };
 };
 
 var SymbolList = function SymbolList() {
@@ -25156,16 +25159,15 @@ var Search = function Search(_ref4) {
 
   var onError = function onError(mdl) {
     return function (error) {
-      mdl.state.searchError = error;
+      mdl.state.errors = error;
       mdl.state.symbols = undefined;
-      console.log("eer searching", mdl.state);
     };
   };
 
   var onSuccess = function onSuccess(mdl) {
     return function (data) {
       mdl.state.symbols = data;
-      mdl.state.searchError = undefined;
+      mdl.state.errors = undefined;
     };
   };
 
@@ -25414,7 +25416,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59866" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58493" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

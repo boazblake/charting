@@ -52,4 +52,10 @@
   margin: 0 auto;
 }
 
+.error {
+  line-height: 3em;
+  font-size: 18px;
+  color: #c0392b;
+}
+
 /*# sourceMappingURL=/charts.e31bb0bc.css.map */
