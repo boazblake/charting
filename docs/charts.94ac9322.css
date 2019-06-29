@@ -1,0 +1,2 @@
+*{box-sizing:border-box}.input{width:100%;line-height:3em;text-transform:uppercase;flex-basis:80%;font-size:18px}.symbolsList{display:flex;flex-flow:column;height:85vh;overflow:scroll}.symbolsList .symbol{padding:10px;line-height:3em;font-size:18px;width:100%;cursor:pointer;color:#f1c40f;background:#34495e}.symbolsList .symbol:hover{background:#f1c40f;color:#34495e;transition:all .4s}.chart{width:90vw;margin:0 auto}
+/*# sourceMappingURL=charts.94ac9322.css.map */

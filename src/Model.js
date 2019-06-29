@@ -1,8 +1,7 @@
 import m from "mithril"
 import Task from "data.task"
 import { apikey } from "../.secrets.js"
-
-// let apikey = "demo"
+import { Stream } from "stream"
 
 const log = (m) => (v) => {
   console.log(m, v)
@@ -10,18 +9,59 @@ const log = (m) => (v) => {
 }
 
 const url = (symbol) =>
-  `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=${symbol}&apikey=${apikey}`
+  `https://cloud.iexapis.com/stable/stock/${symbol}/chart/1y?token=${apikey}`
 
-const http = (url) => m.request({ url })
-const httpTask = (url) => new Task((rej, res) => http(url).then(res, rej))
+const searchUrl = `https://cloud.iexapis.com/stable/ref-data/symbols?token=${apikey}`
 
 const state = {
   profile: "",
+  isLoading: false,
+  loadingProgress: {
+    max: 0,
+    value: 0
+  },
   symbol: "MSFT",
+  symbols: undefined,
   data: undefined,
-  errors: undefined
+  errors: undefined,
+  searchErrors: undefined
 }
 
-const Model = { httpTask, log, url, state }
+function onProgress(e) {
+  console.log("eeee", e)
+  if (e.lengthComputable) {
+    model.state.loadingProgress.max = e.total
+    model.state.loadingProgress.value = e.loaded
+    m.redraw()
+  }
+}
+
+function onLoad() {
+  return false
+}
+
+function onLoadStart() {
+  model.state.isLoading = true
+  return false
+}
+function onLoadEnd() {
+  model.state.isLoading = false
+  model.state.loadingProgress.max = 0
+  model.state.loadingProgress.value = 0
+  return false
+}
+
+const xhrProgress = {
+  config: (xhr) => {
+    console.log(xhr)
+    xhr.onprogress = onProgress
+    xhr.onload = onLoad
+    xhr.onloadstart = onLoadStart
+    xhr.onloadend = onLoadEnd
+  }
+}
+
+const http = (url) => m.request(url, { xhrProgress })
+const Model = { http, log, url, state, searchUrl }
 
 export default Model

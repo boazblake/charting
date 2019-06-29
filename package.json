@@ -21,6 +21,7 @@
     "sanctuary": "^2.0.0"
   },
   "devDependencies": {
+    "cssnano": "^4.1.10",
     "eslint": "^5.16.0",
     "sass": "^1.20.3"
   }

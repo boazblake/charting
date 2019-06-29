@@ -1,42 +1,21 @@
-import { prop, pluck, compose } from "ramda"
-import Either from "data.either"
-import Task from "data.task"
-import { ETIME } from "constants"
+import { compose, filter, map, pluck, prop, props, test } from "ramda"
 
-const catagories = [
-  "1. open",
-  "2. high",
-  "3. low",
-  "4. close",
-  "5. adjusted close",
-  // "6. volume",
-  "7. dividend amount"
-]
+const catagories = ["open", "high", "low", "close"]
 
 const openData = (cats) => pluck(cats[0])
 const highData = (cats) => pluck(cats[1])
 const lowData = (cats) => pluck(cats[2])
 const closeData = (cats) => pluck(cats[3])
-const adjustedData = (cats) => pluck(cats[4])
-const volumeData = (cats) => pluck(cats[5])
-// const amountData = (cats) => pluck(cats[6])
 
-const fromDto = (dto) => {
-  let xaxis = Object.keys(dto)
-  let ys = Object.values(dto)
-  return { xaxis, ys }
-}
-
-const group = (cats) => ({ xaxis, ys }) => {
+const fromDto = (cats) => (dto) => {
+  let xaxis = pluck("date", dto)
   let data = [
-    openData(cats)(ys),
-    highData(cats)(ys),
-    lowData(cats)(ys),
-    closeData(cats)(ys),
-    adjustedData(cats)(ys),
-    volumeData(cats)(ys)
-    // amountData(cats)(ys)
+    openData(cats)(dto),
+    highData(cats)(dto),
+    lowData(cats)(dto),
+    closeData(cats)(dto)
   ]
+
   return { xaxis, data }
 }
 
@@ -60,35 +39,33 @@ const toTraces = (cats) => ({ xaxis, data }) =>
     line: { color: colors[idx] }
   }))
 
-const toViewModel = (cats) =>
+const toChartModel = (cats) =>
   compose(
     toTraces(cats),
-    group(cats),
-    fromDto
+    fromDto(cats)
   )
 
-const parse = (dto) =>
-  prop("Monthly Adjusted Time Series", dto)
-    ? Either.Right(prop("Monthly Adjusted Time Series", dto))
-    : Either.Left(prop("Error Message", dto))
-    ? Either.Left(prop("Note", dto))
-    : Either.Left(Task.rejected({ "Error Message": "undefined error" }))
-
-const eitherToTask = (x) =>
-  x.cata({
-    Left: (error) => Task.rejected(error),
-    Right: (data) =>
-      data == undefined
-        ? Task.rejected({ "Error Message": "undefined error" })
-        : Task.of(data)
-  })
-
 const getStocks = (mdl) =>
-  mdl
-    .httpTask(mdl.url(mdl.state.symbol))
-    .map(parse)
-    .chain(eitherToTask)
-    .map(mdl.log("wft"))
-    .map(toViewModel(catagories))
+  mdl.http(mdl.url(mdl.state.symbol)).then(toChartModel(catagories))
 
-export { getStocks }
+const getProps = map(props(["name", "symbol"]))
+const toObj = ([name, symbol]) => ({ name, symbol })
+
+const toInputModel = compose(
+  map(toObj),
+  getProps
+)
+
+const load = (mdl) => mdl.http(mdl.searchUrl).then(toInputModel)
+
+const testReg = (str) => new RegExp(/str/i)
+
+const by = (query) =>
+  compose(
+    test(new RegExp(query, "i")),
+    prop("name")
+  )
+
+const filterBy = (xs, symbol) => filter(by(symbol), xs)
+
+export { getStocks, load, filterBy }

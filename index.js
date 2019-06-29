@@ -18,7 +18,7 @@ function getProfile(w) {
 }
 
 // Styles
-// import './index.scss'
+import "./index.scss"
 // import './utils/animations.css'
 // import './utils/loader.scss'
 
