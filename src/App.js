@@ -1,5 +1,5 @@
 import m from "mithril"
-import { getStocks, load, filterBy } from "./helpers.js"
+import { getStocks, search, filterBy } from "./helpers.js"
 
 const Errors = ({ attrs: { mdl } }) => {
   let err = mdl.state.errors.message
@@ -45,7 +45,7 @@ const Search = ({ attrs: { mdl } }) => {
 
   return {
     oninit: ({ attrs: { mdl } }) =>
-      load(mdl).then(onSuccess(mdl), onError(mdl)),
+      search(mdl).then(onSuccess(mdl), onError(mdl)),
     view: ({ attrs: { mdl } }) =>
       m(".searchContainer", [
         m(".inputContainer", [

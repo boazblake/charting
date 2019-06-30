@@ -49,6 +49,7 @@ const getStocks = (mdl) =>
   mdl.http(mdl.url(mdl.state.symbol)).then(toChartModel(catagories))
 
 const getProps = map(props(["name", "symbol"]))
+
 const toObj = ([name, symbol]) => ({ name, symbol })
 
 const toInputModel = compose(
@@ -56,9 +57,7 @@ const toInputModel = compose(
   getProps
 )
 
-const load = (mdl) => mdl.http(mdl.searchUrl).then(toInputModel)
-
-const testReg = (str) => new RegExp(/str/i)
+const search = (mdl) => mdl.http(mdl.searchUrl).then(toInputModel)
 
 const by = (query) =>
   compose(
@@ -68,4 +67,19 @@ const by = (query) =>
 
 const filterBy = (xs, symbol) => filter(by(symbol), xs)
 
-export { getStocks, load, filterBy }
+export {
+  filterBy,
+  by,
+  toInputModel,
+  getProps,
+  toObj,
+  getStocks,
+  toChartModel,
+  toTraces,
+  fromDto,
+  openData,
+  highData,
+  lowData,
+  closeData,
+  search
+}

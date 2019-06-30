@@ -1585,7 +1585,7 @@ process.chdir = function (dir) {
 process.umask = function () {
   return 0;
 };
-},{}],"node_modules/data.task/lib/task.js":[function(require,module,exports) {
+},{}],"../../../../node_modules/data.task/lib/task.js":[function(require,module,exports) {
 var process = require("process");
 'use strict';
 
@@ -1941,17 +1941,17 @@ Task.prototype.rejectedMap = function _rejectedMap(f) {
   }, cleanup);
 };
 
-},{"process":"../../../../.config/yarn/global/node_modules/process/browser.js"}],"node_modules/data.task/lib/index.js":[function(require,module,exports) {
+},{"process":"../../../../.config/yarn/global/node_modules/process/browser.js"}],"../../../../node_modules/data.task/lib/index.js":[function(require,module,exports) {
 module.exports = require('./task');
 
-},{"./task":"node_modules/data.task/lib/task.js"}],".secrets.js":[function(require,module,exports) {
+},{"./task":"../../../../node_modules/data.task/lib/task.js"}],".secrets.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.apikey = void 0;
-var apikey = "pk_d1adf76109e04fb18ffff1f4e915034e";
+var apikey = "Tpk_23f34a1e493b4118b56fdda4d592e895";
 exports.apikey = apikey;
 },{}],"../../../../.config/yarn/global/node_modules/node-libs-browser/node_modules/events/events.js":[function(require,module,exports) {
 // Copyright Joyent, Inc. and other Node contributors.
@@ -7460,10 +7460,10 @@ var log = function log(m) {
 };
 
 var url = function url(symbol) {
-  return "https://cloud.iexapis.com/stable/stock/".concat(symbol, "/chart/1y?token=").concat(_secrets.apikey);
+  return "https://sandbox.iexapis.com/stable/stock/".concat(symbol, "/chart/1y?token=").concat(_secrets.apikey);
 };
 
-var searchUrl = "https://cloud.iexapis.com/stable/ref-data/symbols?token=".concat(_secrets.apikey);
+var searchUrl = "https://sandbox.iexapis.com/stable/ref-data/symbols?token=".concat(_secrets.apikey);
 var state = {
   profile: "",
   isLoading: false,
@@ -7530,7 +7530,7 @@ var Model = {
 };
 var _default = Model;
 exports.default = _default;
-},{"mithril":"node_modules/mithril/mithril.js","data.task":"node_modules/data.task/lib/index.js","../.secrets.js":".secrets.js","stream":"../../../../.config/yarn/global/node_modules/stream-browserify/index.js"}],"node_modules/ramda/es/F.js":[function(require,module,exports) {
+},{"mithril":"node_modules/mithril/mithril.js","data.task":"../../../../node_modules/data.task/lib/index.js","../.secrets.js":".secrets.js","stream":"../../../../.config/yarn/global/node_modules/stream-browserify/index.js"}],"node_modules/ramda/es/F.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -25003,7 +25003,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.filterBy = exports.load = exports.getStocks = void 0;
+exports.load = exports.closeData = exports.lowData = exports.highData = exports.openData = exports.fromDto = exports.toTraces = exports.toChartModel = exports.getStocks = exports.toObj = exports.getProps = exports.toInputModel = exports.by = exports.filterBy = void 0;
 
 var _ramda = require("ramda");
 
@@ -25021,17 +25021,25 @@ var openData = function openData(cats) {
   return (0, _ramda.pluck)(cats[0]);
 };
 
+exports.openData = openData;
+
 var highData = function highData(cats) {
   return (0, _ramda.pluck)(cats[1]);
 };
+
+exports.highData = highData;
 
 var lowData = function lowData(cats) {
   return (0, _ramda.pluck)(cats[2]);
 };
 
+exports.lowData = lowData;
+
 var closeData = function closeData(cats) {
   return (0, _ramda.pluck)(cats[3]);
 };
+
+exports.closeData = closeData;
 
 var fromDto = function fromDto(cats) {
   return function (dto) {
@@ -25044,6 +25052,7 @@ var fromDto = function fromDto(cats) {
   };
 };
 
+exports.fromDto = fromDto;
 var colors = ["#34495e", "#8e44ad", "#c0392b", "#d35400", "#27ae60", "#f1c40f", "#7f8c8d"];
 
 var toTraces = function toTraces(cats) {
@@ -25065,9 +25074,13 @@ var toTraces = function toTraces(cats) {
   };
 };
 
+exports.toTraces = toTraces;
+
 var toChartModel = function toChartModel(cats) {
   return (0, _ramda.compose)(toTraces(cats), fromDto(cats));
 };
+
+exports.toChartModel = toChartModel;
 
 var getStocks = function getStocks(mdl) {
   return mdl.http(mdl.url(mdl.state.symbol)).then(toChartModel(catagories));
@@ -25075,6 +25088,7 @@ var getStocks = function getStocks(mdl) {
 
 exports.getStocks = getStocks;
 var getProps = (0, _ramda.map)((0, _ramda.props)(["name", "symbol"]));
+exports.getProps = getProps;
 
 var toObj = function toObj(_ref2) {
   var _ref3 = _slicedToArray(_ref2, 2),
@@ -25087,7 +25101,9 @@ var toObj = function toObj(_ref2) {
   };
 };
 
+exports.toObj = toObj;
 var toInputModel = (0, _ramda.compose)((0, _ramda.map)(toObj), getProps);
+exports.toInputModel = toInputModel;
 
 var load = function load(mdl) {
   return mdl.http(mdl.searchUrl).then(toInputModel);
@@ -25095,13 +25111,11 @@ var load = function load(mdl) {
 
 exports.load = load;
 
-var testReg = function testReg(str) {
-  return new RegExp(/str/i);
-};
-
 var by = function by(query) {
   return (0, _ramda.compose)((0, _ramda.test)(new RegExp(query, "i")), (0, _ramda.prop)("name"));
 };
+
+exports.by = by;
 
 var filterBy = function filterBy(xs, symbol) {
   return (0, _ramda.filter)(by(symbol), xs);
@@ -25416,7 +25430,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58493" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60607" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

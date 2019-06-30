@@ -6,23 +6,20 @@
   "scripts": {
     "dev": "parcel serve ./index.html --out-dir ./docs",
     "build": "parcel build ./index.html --public-url ./ --out-dir ./docs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tests": "ospec '**/*.spec.js' --require esm"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "daggy": "^1.4.0",
-    "data.task": "^3.1.2",
     "mithril": "^1.1.6",
-    "mithril-stream": "^2.0.0",
-    "ospec": "^3.1.0",
-    "ramda": "^0.26.1",
-    "sanctuary": "^2.0.0"
+    "ramda": "^0.26.1"
   },
   "devDependencies": {
     "cssnano": "^4.1.10",
     "eslint": "^5.16.0",
+    "esm": "^3.2.25",
+    "ospec": "^3.1.0",
     "sass": "^1.20.3"
   }
 }

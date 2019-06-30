@@ -9,9 +9,9 @@ const log = (m) => (v) => {
 }
 
 const url = (symbol) =>
-  `https://cloud.iexapis.com/stable/stock/${symbol}/chart/1y?token=${apikey}`
+  `https://sandbox.iexapis.com/stable/stock/${symbol}/chart/1y?token=${apikey}`
 
-const searchUrl = `https://cloud.iexapis.com/stable/ref-data/symbols?token=${apikey}`
+const searchUrl = `https://sandbox.iexapis.com/stable/ref-data/symbols?token=${apikey}`
 
 const state = {
   profile: "",
